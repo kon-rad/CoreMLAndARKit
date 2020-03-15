@@ -24,7 +24,32 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.showsStatistics = true
         
         // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        let scene = SCNScene()
+        
+        let text = SCNText(string: "Hello ARKit", extrusionDepth: 0)
+        
+        text.font = UIFont(name: "Futura", size: 0.15)
+        text.firstMaterial?.diffuse.contents = UIColor.orange
+        text.firstMaterial?.specular.contents = UIColor.white
+        
+        let textNode = SCNNode(geometry: text)
+        textNode.position = SCNVector3(0, 0, -0.5)
+        textNode.scale = SCNVector3Make(0.2, 0.2, 0.2)
+        
+        scene.rootNode.addChildNode(textNode)
+        
+//        let box = SCNBox(width: 0.2, height: 0.2, length: 0.2, chamferRadius: 0)
+//
+//        let material = SCNMaterial()
+//        material.diffuse.contents = UIColor.red
+//
+//        box.materials = [material]
+//
+//        let node = SCNNode(geometry: box)
+//
+//        node.position = SCNVector3(0, 0, -0.5)
+//
+//        scene.rootNode.addChildNode(node)
         
         // Set the scene to the view
         sceneView.scene = scene
