@@ -9,10 +9,16 @@
 import UIKit
 import SceneKit
 import ARKit
+import Vision
 
 class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+    
+    private var resentModel = Resnet50()
+    
+    private var hitTestResult :ARHitTestResult!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,17 +32,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Create a new scene
         let scene = SCNScene()
         
-        let text = SCNText(string: "Hello ARKit", extrusionDepth: 0)
-        
-        text.font = UIFont(name: "Futura", size: 0.15)
-        text.firstMaterial?.diffuse.contents = UIColor.orange
-        text.firstMaterial?.specular.contents = UIColor.white
-        
-        let textNode = SCNNode(geometry: text)
-        textNode.position = SCNVector3(0, 0, -0.5)
-        textNode.scale = SCNVector3Make(0.2, 0.2, 0.2)
-        
-        scene.rootNode.addChildNode(textNode)
+//        let text = SCNText(string: "Hello ARKit", extrusionDepth: 0)
+//
+//        text.font = UIFont(name: "Futura", size: 0.15)
+//        text.firstMaterial?.diffuse.contents = UIColor.orange
+//        text.firstMaterial?.specular.contents = UIColor.white
+//
+//        let textNode = SCNNode(geometry: text)
+//        textNode.position = SCNVector3(0, 0, -0.5)
+//        textNode.scale = SCNVector3Make(0.2, 0.2, 0.2)
+//
+//        scene.rootNode.addChildNode(textNode)
+//
+        // example demo, creating a simple 3D box
         
 //        let box = SCNBox(width: 0.2, height: 0.2, length: 0.2, chamferRadius: 0)
 //
@@ -53,7 +61,40 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the scene to the view
         sceneView.scene = scene
+        
+        registerGestureRecognizers()
     }
+    
+    private func registerGestureRecognizers() {
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
+        self.sceneView.addGestureRecognizer(tapGestureRecognizer)
+        print("registerGestureRecognizers")
+    }
+    
+    @objc func tapped(recognizer :UIGestureRecognizer) {
+        print("tapped")
+        
+        let sceneView = recognizer.view as! ARSCNView
+        let touchLocation = self.sceneView.center
+        
+        guard let currentFrame = sceneView.session.currentFrame else {
+            return
+        }
+        
+        let hitTestResults = sceneView.hitTest(touchLocation, types: .featurePoint)
+        
+        if hitTestResults.isEmpty {
+            return
+        }
+        
+        guard let hitTestResult = hitTestResults.first else {
+            return
+        }
+        
+        self.hitTestResult = hitTestResult
+    }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
